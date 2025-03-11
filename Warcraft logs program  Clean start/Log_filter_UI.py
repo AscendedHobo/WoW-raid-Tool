@@ -15,12 +15,12 @@ class LogAnalyzerGUI:
         self.selected_file = None
         self.csv_output_dir = None
         
-        # Use absolute path to locate main_UI.py relative to this script's location
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        # Adjust the path to correctly point to main_UI.py (same directory example)
-        self.main_ui_path = os.path.join(current_dir, "main_UI.py")
+        # Use the directory of the executable if running as an executable
+        if getattr(sys, 'frozen', False):
+            current_dir = os.path.dirname(sys.executable)
+        else:
+            current_dir = os.path.dirname(os.path.abspath(__file__))
         
-        # GUI setup remains the same...
         # Left Side - Log Filtering
         left_frame = tk.Frame(root)
         left_frame.pack(side=tk.LEFT, padx=20, pady=10)
@@ -51,16 +51,6 @@ class LogAnalyzerGUI:
         
         self.open_folder_button = tk.Button(left_frame, text="Open CSV Folder", command=self.open_csv_folder, state=tk.DISABLED)
         self.open_folder_button.pack(pady=5)
-        
-        # Right Side - Launch Main UI
-        right_frame = tk.Frame(root)
-        right_frame.pack(side=tk.RIGHT, padx=20, pady=10)
-        
-        self.main_ui_label = tk.Label(right_frame, text="Processed CSV ready? Click below:")
-        self.main_ui_label.pack(pady=5)
-        
-        self.load_db_button = tk.Button(right_frame, text="Open Main UI", command=self.launch_main_ui)
-        self.load_db_button.pack(pady=5)
     
     def select_file(self):
         file_path = filedialog.askopenfilename(filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")])
@@ -110,26 +100,6 @@ class LogAnalyzerGUI:
     def open_csv_folder(self):
         if self.csv_output_dir:
             subprocess.Popen(f'explorer "{self.csv_output_dir}"', shell=True)
-    
-    def launch_main_ui(self):
-        try:
-            # Use the precomputed main_ui_path
-            main_ui_path = self.main_ui_path
-            
-            print(f"Attempting to launch main UI from: {main_ui_path}")
-            
-            if os.path.exists(main_ui_path):
-                # Launch the script in its own directory to resolve relative paths
-                subprocess.Popen(
-                    [sys.executable, main_ui_path],
-                    cwd=os.path.dirname(main_ui_path)  # Set working directory
-                )
-            else:
-                messagebox.showerror("File Not Found", f"Main UI script not found at {main_ui_path}")
-                print(f"ERROR: Main UI script does not exist at {main_ui_path}")
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to launch main UI: {str(e)}")
-            print(f"EXCEPTION: {e}")
 
 if __name__ == "__main__":
     root = TkinterDnD.Tk()

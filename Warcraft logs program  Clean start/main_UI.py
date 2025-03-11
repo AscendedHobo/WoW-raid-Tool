@@ -10,6 +10,8 @@ import numpy as np
 import os
 from PIL import Image, ImageTk
 from matplotlib.collections import LineCollection
+import sys
+from pathlib import Path
 
 class AutocompletePanel:
     def __init__(self, parent, label_text, is_spell_panel=False):
@@ -89,6 +91,15 @@ class CSVVisualizer:
         self.root = root
         self.root.title("Combat Data Visualizer")
         self.root.geometry("1000x800")
+        
+        # Get the directory where the script/executable is located
+        if getattr(sys, 'frozen', False):
+            # Running as executable
+            self.current_dir = Path(os.path.dirname(sys.executable))
+        else:
+            # Running as script
+            self.current_dir = Path(__file__).resolve().parent
+            
         self.df = None
         self.plot_window = None
         self.current_event_type = None
@@ -432,6 +443,10 @@ class CSVVisualizer:
 
     def process_file(self, path):
         try:
+            # Convert relative paths to absolute using current_dir if needed
+            if not os.path.isabs(path):
+                path = self.current_dir / path
+                
             self.df = pd.read_csv(path)
             self.df['timestamp'] = pd.to_datetime(
                 self.df['timestamp'], format="%m/%d/%Y %H:%M:%S.%f", errors='coerce'

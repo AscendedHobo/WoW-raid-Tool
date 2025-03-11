@@ -1,5 +1,6 @@
 import csv
 import os
+import sys
 from pathlib import Path
 from datetime import datetime, timedelta
 
@@ -9,8 +10,13 @@ def load_csv(file_name, output_name):
     and track unit positions for UNIT_DIED events.
     '''
     
-    # Define the base directory dynamically (current script directory)
-    base_dir = Path(__file__).resolve().parent
+    # Define the base directory dynamically based on whether running as exe or script
+    if getattr(sys, 'frozen', False):
+        # Running as executable
+        base_dir = Path(os.path.dirname(sys.executable))
+    else:
+        # Running as script
+        base_dir = Path(__file__).resolve().parent
 
     # Construct full paths
     file_path = base_dir / file_name

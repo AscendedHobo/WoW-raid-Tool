@@ -1,10 +1,16 @@
 import csv
 import re
 import sys
+import os
 from pathlib import Path
 
-# Get the directory where the script is located
-script_dir = Path(__file__).resolve().parent
+# Get the directory where the script/executable is located
+if getattr(sys, 'frozen', False):
+    # Running as executable
+    current_dir = Path(os.path.dirname(sys.executable))
+else:
+    # Running as script
+    current_dir = Path(__file__).resolve().parent
 
 # Accept input log file from command-line argument
 if len(sys.argv) < 2:
@@ -13,8 +19,8 @@ if len(sys.argv) < 2:
 
 log_file_path = Path(sys.argv[1])
 
-# Define the output filtered log CSV file path
-floats_csv_path = script_dir / "combat_log_with_floats.csv"
+# Define the output filtered log CSV file path relative to current directory
+floats_csv_path = current_dir / "combat_log_with_floats.csv"
 
 # List of metadata event types to exclude
 excluded_events = {"COMBAT_LOG_VERSION", "MAP_CHANGE", "COMBATANT_INFO"}
